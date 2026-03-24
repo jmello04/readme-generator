@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>README Generator — Documentação Técnica Profissional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:       #0a0f1e;
+      --surface:  #111827;
+      --card:     #1a2235;
+      --border:   #2a3548;
+      --border-hi:#374357;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --accent:   #6d28d9;
+      --accent-hi:#7c3aed;
+      --accent-lt:#a78bfa;
+    }
+
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Inter',system-ui,sans-serif;
+      min-height:100vh;
+    }
+
+    /* ── Scrollbar ──────────────────────────────────────── */
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-track{background:var(--surface)}
+    ::-webkit-scrollbar-thumb{background:#374357;border-radius:4px}
+    ::-webkit-scrollbar-thumb:hover{background:var(--accent-hi)}
+
+    /* ── Inputs ─────────────────────────────────────────── */
+    .field{
+      background:var(--card);
+      border:1.5px solid var(--border);
+      color:var(--text);
+      border-radius:10px;
+      padding:10px 14px;
+      width:100%;
+      font-size:.875rem;
+      transition:border-color .2s,box-shadow .2s;
+      outline:none;
+    }
+    .field:focus{
+      border-color:var(--accent-hi);
+      box-shadow:0 0 0 3px rgba(109,40,217,.18);
+    }
+    .field::placeholder{color:var(--muted)}
+    select.field option{background:var(--card)}
+
+    /* ── Buttons ─────────────────────────────────────────── */
+    .btn-primary{
+      background:linear-gradient(135deg,#7c3aed,#4338ca);
+      color:#fff;
+      border:none;
+      border-radius:10px;
+      padding:13px 20px;
+      font-size:.875rem;
+      font-weight:600;
+      cursor:pointer;
+      width:100%;
+      letter-spacing:.02em;
+      transition:opacity .2s,transform .15s,box-shadow .2s;
+      box-shadow:0 4px 14px rgba(109,40,217,.4);
+    }
+    .btn-primary:hover:not(:disabled){opacity:.92;transform:translateY(-1px);box-shadow:0 6px 20px rgba(109,40,217,.5)}
+    .btn-primary:active:not(:disabled){transform:translateY(0)}
+    .btn-primary:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+    .btn-icon{
+      display:inline-flex;align-items:center;gap:5px;
+      background:transparent;border:1.5px solid var(--border);
+      color:var(--muted);border-radius:8px;padding:6px 12px;
+      font-size:.75rem;font-weight:500;cursor:pointer;
+      transition:all .2s;white-space:nowrap;
+    }
+    .btn-icon:hover{border-color:var(--accent-lt);color:var(--text);background:rgba(109,40,217,.1)}
+
+    /* ── Checkboxes ──────────────────────────────────────── */
+    .check-row{
+      display:flex;align-items:center;gap:10px;
+      cursor:pointer;font-size:.875rem;color:#94a3b8;
+      user-select:none;padding:8px 12px;border-radius:8px;
+      transition:background .15s,color .15s;
+    }
+    .check-row:hover{background:rgba(109,40,217,.08);color:var(--text)}
+    .check-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent-hi);cursor:pointer}
+
+    /* ── Tabs ────────────────────────────────────────────── */
+    .tab{
+      padding:5px 14px;border-radius:6px;font-size:.78rem;
+      font-weight:500;cursor:pointer;border:none;outline:none;
+      transition:background .15s,color .15s;
+    }
+    .tab.on{background:var(--accent-hi);color:#fff}
+    .tab.off{background:transparent;color:var(--muted)}
+    .tab.off:hover{color:var(--text)}
+
+    /* ── Section label ───────────────────────────────────── */
+    .lbl{
+      font-size:.7rem;font-weight:600;text-transform:uppercase;
+      letter-spacing:.09em;color:var(--muted);margin-bottom:6px;
+    }
+
+    /* ── Chips ───────────────────────────────────────────── */
+    .chip{
+      display:inline-flex;align-items:center;
+      background:rgba(109,40,217,.15);border:1px solid rgba(109,40,217,.35);
+      color:var(--accent-lt);padding:2px 9px;border-radius:9999px;
+      font-size:.7rem;font-weight:500;
+    }
+
+    /* ── Markdown Preview ────────────────────────────────── */
+    #md-render h1{font-size:1.65rem;font-weight:700;color:#f8fafc;border-bottom:1px solid var(--border);padding-bottom:.45rem;margin:1.4rem 0 .9rem}
+    #md-render h2{font-size:1.3rem;font-weight:600;color:#f1f5f9;margin:1.4rem 0 .7rem}
+    #md-render h3{font-size:1.05rem;font-weight:600;color:#e2e8f0;margin:1.1rem 0 .5rem}
+    #md-render h4{font-size:.95rem;font-weight:600;color:#cbd5e1;margin:.9rem 0 .4rem}
+    #md-render p{color:#cbd5e1;line-height:1.75;margin:.45rem 0}
+    #md-render ul,#md-render ol{padding-left:1.4rem;margin:.45rem 0}
+    #md-render li{color:#cbd5e1;line-height:1.75;margin:.18rem 0}
+    #md-render a{color:var(--accent-lt);text-decoration:underline}
+    #md-render a:hover{color:#c4b5fd}
+    #md-render strong{color:#f1f5f9;font-weight:600}
+    #md-render code{background:#0f172a;border:1px solid var(--border);color:var(--accent-lt);padding:1px 6px;border-radius:4px;font-size:.78rem;font-family:'Fira Code',monospace}
+    #md-render pre{background:#0a0f1e!important;border:1px solid var(--border);border-radius:10px;padding:1rem;margin:.7rem 0;overflow-x:auto}
+    #md-render pre code{background:transparent;border:none;color:#e2e8f0;padding:0;font-size:.81rem}
+    #md-render blockquote{border-left:3px solid var(--accent-hi);padding-left:1rem;margin:.7rem 0;color:#94a3b8;font-style:italic}
+    #md-render table{width:100%;border-collapse:collapse;margin:.7rem 0;font-size:.83rem}
+    #md-render th{background:var(--card);color:#f1f5f9;padding:8px 12px;text-align:left;border:1px solid var(--border)}
+    #md-render td{padding:7px 12px;border:1px solid #2d3748;color:#cbd5e1}
+    #md-render tr:nth-child(even) td{background:rgba(26,34,53,.5)}
+    #md-render img{max-width:100%;border-radius:6px;display:inline-block}
+    #md-render hr{border:none;border-top:1px solid var(--border);margin:1.4rem 0}
+    #md-render div[align=center]{text-align:center}
+
+    /* ── Raw Markdown ────────────────────────────────────── */
+    #md-raw{
+      white-space:pre-wrap;word-break:break-word;
+      font-family:'Fira Code',monospace;font-size:.78rem;
+      color:#94a3b8;line-height:1.65;
+    }
+
+    /* ── Toasts ──────────────────────────────────────────── */
+    .toast{
+      position:fixed;bottom:24px;right:24px;
+      padding:10px 16px;border-radius:10px;font-size:.82rem;font-weight:500;
+      opacity:0;transform:translateY(10px);
+      transition:opacity .25s,transform .25s;
+      z-index:9999;pointer-events:none;
+    }
+    .toast.show{opacity:1;transform:translateY(0)}
+    #toast-ok{background:#059669;color:#fff}
+    #toast-err{background:#dc2626;color:#fff}
+
+    /* ── Cursor blink ────────────────────────────────────── */
+    .blink{
+      display:inline-block;width:2px;height:.95em;
+      background:var(--accent-hi);margin-left:2px;vertical-align:middle;
+      animation:blinkAnim .8s ease-in-out infinite;
+    }
+    @keyframes blinkAnim{0%,100%{opacity:1}50%{opacity:.1}}
+
+    /* ── Skeleton ────────────────────────────────────────── */
+    .skel{
+      background:linear-gradient(90deg,var(--card) 25%,var(--border) 50%,var(--card) 75%);
+      background-size:200% 100%;
+      animation:skelAnim 1.5s ease-in-out infinite;
+      border-radius:6px;
+    }
+    @keyframes skelAnim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════════════════════════════════ -->
+<header style="border-bottom:1px solid var(--border);padding:14px 24px;position:sticky;top:0;z-index:50;background:rgba(10,15,30,.92);backdrop-filter:blur(12px)">
+  <div style="max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#4338ca);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <div>
+        <div style="font-size:.9rem;font-weight:700;color:#fff;line-height:1.2">README Generator</div>
+        <div style="font-size:.7rem;color:var(--muted)">Documentação técnica profissional</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <span class="chip">v1.0.0</span>
+      <span class="chip">FastAPI</span>
+      <span class="chip">Python 3.11+</span>
+      <a href="/docs" target="_blank" class="chip" style="text-decoration:none;cursor:pointer">Swagger →</a>
+    </div>
+  </div>
+</header>
+
+<!-- ══ MAIN ════════════════════════════════════════════════════════════════════ -->
+<main style="max-width:1440px;margin:0 auto;padding:20px 16px;display:flex;gap:16px;min-height:calc(100vh - 65px)">
+
+  <!-- ── FORMULÁRIO ──────────────────────────────────────────────────────────── -->
+  <div style="width:400px;flex-shrink:0">
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;position:sticky;top:81px;max-height:calc(100vh - 97px);overflow-y:auto;display:flex;flex-direction:column">
+
+      <div style="padding:18px 20px;border-bottom:1px solid var(--border)">
+        <div style="font-size:.875rem;font-weight:700;color:#fff">Informações do Projeto</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:3px">Preencha os campos · pressione <kbd style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:.65rem;color:#94a3b8">Ctrl+↵</kbd> para gerar</div>
+      </div>
+
+      <form id="form" style="padding:18px 20px;display:flex;flex-direction:column;gap:16px">
+
+        <!-- Nome -->
+        <div>
+          <div class="lbl">Nome do Projeto *</div>
+          <input id="project_name" type="text" class="field" placeholder="ex: FastAPI Boilerplate" maxlength="100" required />
+        </div>
+
+        <!-- Descrição -->
+        <div>
+          <div class="lbl" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Descrição Resumida *</span>
+            <span id="desc-count" style="font-size:.68rem;color:var(--muted)">0 / 1000</span>
+          </div>
+          <textarea id="description" class="field" rows="3" maxlength="1000" placeholder="Descreva o objetivo do projeto e o problema que ele resolve..." required style="resize:vertical;min-height:78px"></textarea>
+        </div>
+
+        <!-- Stack -->
+        <div>
+          <div class="lbl">Stack Utilizada *</div>
+          <input id="stack" type="text" class="field" placeholder="ex: Python, FastAPI, PostgreSQL, Redis" maxlength="300" required />
+          <div id="stack-chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;min-height:4px"></div>
+        </div>
+
+        <!-- Tipo -->
+        <div>
+          <div class="lbl">Tipo de Projeto *</div>
+          <select id="project_type" class="field" required>
+            <option value="" disabled selected>Selecione o tipo</option>
+            <option value="api">🔌  API REST / GraphQL</option>
+            <option value="cli">⌨️  Ferramenta CLI</option>
+            <option value="scraper">🕷️  Scraper / Crawler</option>
+            <option value="library">📦  Biblioteca / Package</option>
+          </select>
+        </div>
+
+        <!-- Recursos -->
+        <div>
+          <div class="lbl">Recursos do Projeto</div>
+          <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;overflow:hidden">
+            <label class="check-row" style="border-bottom:1px solid var(--border)">
+              <input type="checkbox" id="has_docker" />
+              <span>🐳 Docker e docker-compose</span>
+            </label>
+            <label class="check-row" style="border-bottom:1px solid var(--border)">
+              <input type="checkbox" id="has_tests" />
+              <span>✅ Testes automatizados</span>
+            </label>
+            <label class="check-row">
+              <input type="checkbox" id="has_cicd" />
+              <span>🚀 Pipeline CI/CD</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Autor / Contato -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <div class="lbl">Autor</div>
+            <input id="author" type="text" class="field" placeholder="Seu nome" maxlength="100" />
+          </div>
+          <div>
+            <div class="lbl">Contato</div>
+            <input id="contact" type="text" class="field" placeholder="email ou @user" maxlength="200" />
+          </div>
+        </div>
+
+        <!-- Botão -->
+        <button type="submit" id="btn-gen" class="btn-primary" style="margin-top:4px">
+          <span id="btn-txt">✨&nbsp; Gerar README</span>
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ── PREVIEW ─────────────────────────────────────────────────────────────── -->
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;display:flex;flex-direction:column;flex:1">
+
+      <!-- Cabeçalho do preview -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);gap:8px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:5px">
+            <div style="width:11px;height:11px;border-radius:50%;background:#ef4444;opacity:.7"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#f59e0b;opacity:.7"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#22c55e;opacity:.7"></div>
+          </div>
+          <span style="font-size:.78rem;color:var(--muted)">README.md</span>
+          <div id="streaming-badge" style="display:none;align-items:center;gap:6px">
+            <span class="blink"></span>
+            <span style="font-size:.72rem;color:var(--accent-lt)">gerando…</span>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:6px">
+          <!-- Tabs -->
+          <div style="display:flex;gap:2px;background:var(--surface);padding:3px;border-radius:8px">
+            <button class="tab on" id="tab-pv" onclick="setTab('preview')">Preview</button>
+            <button class="tab off" id="tab-raw" onclick="setTab('raw')">Markdown</button>
+          </div>
+          <!-- Ações -->
+          <button id="btn-copy" class="btn-icon" style="display:none" onclick="copyMd()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Copiar
+          </button>
+          <button id="btn-dl" class="btn-icon" style="display:none" onclick="downloadMd()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Download
+          </button>
+        </div>
+      </div>
+
+      <!-- Conteúdo do preview -->
+      <div id="preview-wrap" style="flex:1;overflow-y:auto;padding:24px;position:relative;min-height:500px">
+
+        <!-- Estado vazio -->
+        <div id="empty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px">
+          <div style="width:64px;height:64px;border-radius:18px;background:rgba(109,40,217,.1);border:1.5px solid rgba(109,40,217,.25);display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+            <svg width="32" height="32" fill="none" stroke="#7c3aed" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div style="font-size:.95rem;font-weight:600;color:#cbd5e1;margin-bottom:8px">Nenhum README gerado ainda</div>
+          <div style="font-size:.8rem;color:var(--muted);max-width:320px;line-height:1.6">Preencha o formulário ao lado e clique em <strong style="color:var(--accent-lt)">Gerar README</strong> — o resultado aparece aqui em tempo real.</div>
+          <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+            <span class="chip">✅ Preview renderizado</span>
+            <span class="chip">📋 Copiar Markdown</span>
+            <span class="chip">⬇️ Download .md</span>
+          </div>
+        </div>
+
+        <!-- Skeleton (loading) -->
+        <div id="skeleton" style="display:none;flex-direction:column;gap:12px">
+          <div class="skel" style="height:36px;width:60%"></div>
+          <div class="skel" style="height:18px;width:90%"></div>
+          <div class="skel" style="height:18px;width:75%"></div>
+          <div class="skel" style="height:18px;width:82%"></div>
+          <div style="height:16px"></div>
+          <div class="skel" style="height:24px;width:35%"></div>
+          <div class="skel" style="height:18px;width:88%"></div>
+          <div class="skel" style="height:18px;width:70%"></div>
+        </div>
+
+        <!-- Preview renderizado -->
+        <div id="md-render" style="display:none"></div>
+
+        <!-- Preview raw -->
+        <pre id="md-raw" style="display:none"></pre>
+
+      </div>
+
+      <!-- Rodapé de estatísticas -->
+      <div id="stats-bar" style="display:none;padding:8px 16px;border-top:1px solid var(--border);display:none;align-items:center;gap:12px;font-size:.72rem;color:var(--muted)">
+        <span id="stat-words">—</span>
+        <span style="color:var(--border)">·</span>
+        <span id="stat-chars">—</span>
+        <span style="color:var(--border)">·</span>
+        <span id="stat-read">—</span>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ TOASTS ══════════════════════════════════════════════════════════════════ -->
+<div class="toast" id="toast-ok">✅ Markdown copiado!</div>
+<div class="toast" id="toast-err" id="toast-err"></div>
+
+<script>
+// ─── Estado ──────────────────────────────────────────────────────────────────
+let md = '';
+let tab = 'preview';
+let busy = false;
+
+// ─── marked.js ───────────────────────────────────────────────────────────────
+const renderer = new marked.Renderer();
+renderer.code = (code, lang) => {
+  const l = (lang || '').split(' ')[0] || 'plaintext';
+  let hl = code;
+  try { hl = hljs.getLanguage(l) ? hljs.highlight(code,{language:l}).value : hljs.highlightAuto(code).value; } catch{}
+  return `<pre><code class="hljs language-${l}">${hl}</code></pre>`;
+};
+marked.use({ renderer, gfm:true, breaks:true });
+
+// ─── Helpers de aba ──────────────────────────────────────────────────────────
+function setTab(t) {
+  tab = t;
+  document.getElementById('tab-pv').className  = 'tab ' + (t==='preview'?'on':'off');
+  document.getElementById('tab-raw').className = 'tab ' + (t==='raw'?'on':'off');
+  document.getElementById('md-render').style.display = t==='preview' && md ? 'block' : 'none';
+  document.getElementById('md-raw').style.display    = t==='raw'     && md ? 'block' : 'none';
+}
+
+// ─── Renderizar Markdown ──────────────────────────────────────────────────────
+function render(content) {
+  document.getElementById('md-render').innerHTML = marked.parse(content);
+  document.getElementById('md-raw').textContent = content;
+}
+
+// ─── Mostrar área de conteúdo ─────────────────────────────────────────────────
+function showContent() {
+  document.getElementById('empty').style.display    = 'none';
+  document.getElementById('skeleton').style.display = 'none';
+  document.getElementById('md-render').style.display = tab==='preview' ? 'block' : 'none';
+  document.getElementById('md-raw').style.display    = tab==='raw'     ? 'block' : 'none';
+  document.getElementById('btn-copy').style.display = 'inline-flex';
+  document.getElementById('btn-dl').style.display   = 'inline-flex';
+}
+
+// ─── Estatísticas ─────────────────────────────────────────────────────────────
+function updateStats(content) {
+  const words = content.trim().split(/\s+/).filter(w=>w).length;
+  const chars = content.length;
+  const mins  = Math.max(1, Math.ceil(words / 200));
+  const fmt   = n => n.toLocaleString('pt-BR');
+  document.getElementById('stat-words').textContent = `${fmt(words)} palavras`;
+  document.getElementById('stat-chars').textContent = `${fmt(chars)} caracteres`;
+  document.getElementById('stat-read').textContent  = `~${mins} min de leitura`;
+  document.getElementById('stats-bar').style.display = 'flex';
+}
+
+// ─── Loading ──────────────────────────────────────────────────────────────────
+function setLoading(v) {
+  busy = v;
+  document.getElementById('btn-gen').disabled = v;
+  document.getElementById('btn-txt').textContent = v ? '⏳  Gerando…' : '✨\u00a0 Gerar README';
+  document.getElementById('streaming-badge').style.display = v ? 'flex' : 'none';
+  if (v) {
+    document.getElementById('empty').style.display    = 'none';
+    document.getElementById('skeleton').style.display = 'flex';
+    document.getElementById('md-render').style.display = 'none';
+    document.getElementById('md-raw').style.display    = 'none';
+    document.getElementById('stats-bar').style.display = 'none';
+    document.getElementById('btn-copy').style.display  = 'none';
+    document.getElementById('btn-dl').style.display    = 'none';
+  }
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function toast(id, msg, ms=2800) {
+  const el = document.getElementById(id);
+  if (msg) el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), ms);
+}
+
+// ─── Copiar ───────────────────────────────────────────────────────────────────
+function copyMd() {
+  if (!md) return;
+  navigator.clipboard.writeText(md).then(()=>toast('toast-ok'));
+}
+
+// ─── Download ─────────────────────────────────────────────────────────────────
+function downloadMd() {
+  if (!md) return;
+  const name = (document.getElementById('project_name').value.trim() || 'readme')
+    .toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'') + '.md';
+  const url = URL.createObjectURL(new Blob([md], {type:'text/markdown'}));
+  Object.assign(document.createElement('a'), {href:url, download:name}).click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── Contador de descrição ────────────────────────────────────────────────────
+document.getElementById('description').addEventListener('input', function() {
+  const el = document.getElementById('desc-count');
+  el.textContent = `${this.value.length} / 1000`;
+  el.style.color = this.value.length > 900 ? '#f59e0b' : 'var(--muted)';
+});
+
+// ─── Chips da stack ────────────────────────────────────────────────────────────
+document.getElementById('stack').addEventListener('input', function() {
+  const chips = document.getElementById('stack-chips');
+  const tags = this.value.split(',').map(t=>t.trim()).filter(Boolean);
+  chips.innerHTML = tags.map(t=>`<span class="chip">${t}</span>`).join('');
+});
+
+// ─── Ctrl+Enter ───────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey||e.metaKey) && e.key==='Enter' && !busy)
+    document.getElementById('form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+});
+
+// ─── Submit ───────────────────────────────────────────────────────────────────
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (busy) return;
+
+  const ptype = document.getElementById('project_type').value;
+  if (!ptype) { toast('toast-err','⚠️ Selecione o tipo de projeto.'); return; }
+
+  const payload = {
+    project_name: document.getElementById('project_name').value.trim(),
+    description:  document.getElementById('description').value.trim(),
+    stack:        document.getElementById('stack').value.trim(),
+    project_type: ptype,
+    has_docker:   document.getElementById('has_docker').checked,
+    has_tests:    document.getElementById('has_tests').checked,
+    has_cicd:     document.getElementById('has_cicd').checked,
+    author:       document.getElementById('author').value.trim() || null,
+    contact:      document.getElementById('contact').value.trim() || null,
+  };
+
+  md = '';
+  setLoading(true);
+
+  try {
+    const res = await fetch('/generate/stream', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) { const e=await res.json(); throw new Error(e.detail||'Erro no servidor.'); }
+
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer    = '';
+    let first     = true;
+
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, {stream:true});
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (raw === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.error) throw new Error(parsed.error);
+          if (parsed.content) {
+            if (first) { setLoading(false); showContent(); first=false; }
+            md += parsed.content;
+            render(md);
+          }
+        } catch(pe) { if (pe.message!=='Unexpected end of JSON input') throw pe; }
+      }
+    }
+    if (md) updateStats(md);
+
+  } catch(err) {
+    setLoading(false);
+    md = `> ❌ **Erro:** ${err.message}\n\nVerifique se a variável \`ANTHROPIC_API_KEY\` está configurada no arquivo \`.env\`.`;
+    showContent();
+    render(md);
+    toast('toast-err', `❌ ${err.message}`, 4000);
+  } finally {
+    setLoading(false);
+  }
+});
+</script>
+</body>
+</html>
