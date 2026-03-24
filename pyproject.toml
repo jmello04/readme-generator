@@ -1,0 +1,45 @@
+[project]
+name = "readme-generator"
+version = "1.0.0"
+description = "Ferramenta web para geração automática de documentação técnica profissional"
+authors = [{ name = "João Mello", email = "jmello04@github.com" }]
+license = { text = "MIT" }
+requires-python = ">=3.11"
+readme = "README.md"
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "anthropic>=0.39.0",
+    "python-dotenv>=1.0.0",
+    "pydantic-settings>=2.0.0",
+    "httpx>=0.25.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "anyio>=4.0.0",
+    "ruff>=0.4.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["N818", "E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/static/*", "app/__init__.py", "app/*/__ init__.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
