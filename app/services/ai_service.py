@@ -93,7 +93,9 @@ def generate_readme(data: dict) -> str:
         )
         return result
     except anthropic.AuthenticationError as exc:
-        raise AIAuthError("Chave de API inválida ou não autorizada. Verifique o arquivo .env.") from exc
+        raise AIAuthError(
+            "Chave de API inválida ou não autorizada. Verifique o arquivo .env."
+        ) from exc
     except anthropic.RateLimitError as exc:
         raise AIRateLimitError("Limite de requisições atingido. Aguarde alguns instantes.") from exc
     except anthropic.APIError as exc:

@@ -57,7 +57,9 @@ async def test_generate_trata_erro_generico(sample_payload):
 
 @pytest.mark.asyncio
 async def test_generate_trata_erro_autenticacao(sample_payload):
-    with patch("app.api.routes.generate.generate_readme", side_effect=AIAuthError("Chave inválida")):
+    with patch(
+        "app.api.routes.generate.generate_readme", side_effect=AIAuthError("Chave inválida")
+    ):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post("/generate", json=sample_payload)
     assert response.status_code == 401
@@ -66,7 +68,9 @@ async def test_generate_trata_erro_autenticacao(sample_payload):
 
 @pytest.mark.asyncio
 async def test_generate_trata_rate_limit(sample_payload):
-    with patch("app.api.routes.generate.generate_readme", side_effect=AIRateLimitError("Rate limit")):
+    with patch(
+        "app.api.routes.generate.generate_readme", side_effect=AIRateLimitError("Rate limit")
+    ):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.post("/generate", json=sample_payload)
     assert response.status_code == 429
