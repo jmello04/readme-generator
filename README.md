@@ -1,333 +1,209 @@
 <div align="center">
 
-# 📄 README Generator
+# README Generator
 
 [![CI](https://github.com/jmello04/readme-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/jmello04/readme-generator/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688?style=flat-square&logo=fastapi&logoColor=white)
-![Anthropic](https://img.shields.io/badge/Anthropic_SDK-0.39+-CC785C?style=flat-square&logo=anthropic&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white)
-![Pytest](https://img.shields.io/badge/Testes-Pytest-0A9EDC?style=flat-square&logo=pytest&logoColor=white)
-![Ruff](https://img.shields.io/badge/Lint-Ruff-FCC21B?style=flat-square&logo=ruff&logoColor=black)
-![MIT License](https://img.shields.io/badge/Licença-MIT-22c55e?style=flat-square)
+![MIT License](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)
 
-**Ferramenta web que transforma a descrição do seu projeto em documentação técnica completa e profissional em segundos — com preview em tempo real via streaming.**
-
-[Começar agora](#-como-instalar-e-rodar) · [API Reference](#-api-reference) · [Guia de Contribuição](CONTRIBUTING.md)
+**Ferramenta web para geracao automatizada de documentacao tecnica com preview ao vivo via Server-Sent Events.**
 
 </div>
 
 ---
 
-## 📋 Sobre o Projeto
+## Sobre o Projeto
 
-O **README Generator** é uma aplicação web full-stack que resolve um problema comum no desenvolvimento de software: criar documentação técnica profissional consome tempo e exige experiência com Markdown, badges e boas práticas de documentação.
+Criar um README profissional consome tempo e exige consistencia: badges corretos, estrutura de secoes,
+exemplos de codigo realistas, tabelas de stack. Qualquer detalhe fora do padrao prejudica a
+credibilidade do projeto.
 
-Com uma interface moderna de **dois painéis** — formulário à esquerda, preview ao vivo à direita — você preenche as informações básicas do projeto e acompanha o README sendo gerado **palavra por palavra em tempo real** via streaming SSE. O resultado inclui badges de tecnologia, tabela de stack, exemplos de código, estrutura de pastas e todas as seções que um README de qualidade precisa ter.
+O **README Generator** resolve isso com uma interface web de dois paineis: a esquerda um formulario
+com os metadados do projeto; a direita o documento sendo construido palavra por palavra em tempo real
+via streaming SSE. O resultado final inclui todas as secoes de um README de qualidade e pode ser
+copiado ou baixado com um unico clique.
 
-### Por que este projeto se destaca
+### Destaques tecnicos
 
-- **Arquitetura limpa**: separação de responsabilidades em camadas (models, services, routes, core)
-- **Streaming real**: SSE com `AsyncAnthropic`, sem polling nem timeouts
-- **Tratamento de erros tipado**: exceptions customizadas (`AIAuthError`, `AIRateLimitError`) com handlers globais no FastAPI
-- **Observabilidade**: logging centralizado e header `X-Process-Time` em todas as respostas
-- **CI/CD completo**: pipeline com lint (Ruff) → testes (pytest + coverage) → build Docker
-- **Testável**: mocks precisos com `unittest.mock`; sem chamadas reais à API nos testes
-
----
-
-## ✨ Funcionalidades
-
-- **⚡ Streaming em tempo real** — Acompanhe o README sendo escrito via Server-Sent Events
-- **📑 Preview duplo** — Visualização renderizada (HTML + highlight.js) e Markdown puro
-- **📋 Copiar com um clique** — Copia o Markdown completo para a área de transferência
-- **⬇️ Download .md** — Baixa o arquivo com o nome do projeto
-- **🏷️ Stack chips** — Tags visuais aparecem conforme você digita as tecnologias
-- **📊 Estatísticas** — Contador de palavras, caracteres e tempo estimado de leitura
-- **⌨️ Atalho de teclado** — `Ctrl+Enter` para gerar sem tirar as mãos do teclado
-- **🐳 Suporte a Docker** — Seção de instalação com docker-compose gerada automaticamente
-- **🔌 API REST documentada** — Swagger UI em `/docs` e ReDoc em `/redoc`
-- **✅ Testes automatizados** — Suite pytest com 11 casos de teste e cobertura de código
+- **Arquitetura em camadas** - separacao clara entre modelos, servicos, rotas e configuracao
+- **Streaming real via SSE** - sem polling, sem timeouts artificiais
+- **Tratamento de erros tipado** - excecoes customizadas com handlers globais no FastAPI
+- **Observabilidade** - logging centralizado e header X-Process-Time em todas as respostas
+- **CI/CD completo** - pipeline com lint (Ruff), testes (pytest) e build Docker
+- **Testes sem dependencias externas** - mocks precisos com unittest.mock
 
 ---
 
-## 🛠️ Stack Utilizada
+## Funcionalidades
 
-| Tecnologia | Versão | Finalidade |
+- Streaming em tempo real via Server-Sent Events
+- Preview duplo: HTML renderizado e Markdown puro lado a lado
+- Copiar com um clique para a area de transferencia
+- Download do arquivo .md com o nome do projeto
+- Stack chips visuais gerados conforme voce digita
+- Contador de palavras, caracteres e tempo de leitura
+- Atalho Ctrl+Enter para gerar sem tirar as maos do teclado
+- API REST documentada via Swagger UI em /docs e ReDoc em /redoc
+- Suite de 11 testes automatizados com cobertura de codigo
+
+---
+
+## Arquitetura
+
+O servico de geracao isola completamente o acesso a API externa. As rotas nao conhecem detalhes
+de autenticacao nem do protocolo de streaming; apenas consomem o gerador assincrono exposto.
+
+---
+
+## Stack
+
+| Tecnologia | Versao | Motivo |
 |---|---|---|
 | Python | 3.11+ | Linguagem principal |
-| FastAPI | 0.104+ | Framework web ASGI |
-| Anthropic SDK | 0.39+ | Geração de conteúdo via API |
-| Pydantic v2 | 2.x | Validação de dados e schemas |
-| pydantic-settings | 2.x | Configuração via variáveis de ambiente |
+| FastAPI | 0.104+ | Framework ASGI com streaming nativo e tipagem |
+| Pydantic v2 | 2.x | Validacao de entrada com erros descritivos |
+| pydantic-settings | 2.x | Configuracao 12-factor via variaveis de ambiente |
 | Uvicorn | 0.24+ | Servidor ASGI de alta performance |
-| Tailwind CSS | CDN | Estilização da interface |
-| marked.js | 9.1+ | Renderização de Markdown no browser |
+| Tailwind CSS | CDN | Estilizacao da interface sem build step |
+| marked.js | 9.1+ | Renderizacao de Markdown no browser |
 | highlight.js | 11.9+ | Syntax highlighting no preview |
-| pytest + pytest-asyncio | 7.4+ | Testes automatizados async |
-| Ruff | 0.4+ | Lint e formatação de código |
-| Docker | 20+ | Containerização |
+| pytest + pytest-asyncio | 7.4+ | Testes assincronos com mocks |
+| Ruff | 0.4+ | Lint e formatacao em um unico binario |
+| Docker | 20+ | Containerizacao reproduzivel |
 
 ---
 
-## 🚀 Como Instalar e Rodar
+## Como Instalar e Rodar
 
-### Pré-requisitos
+### Pre-requisitos
 
-- **Python 3.11+**
-- **pip**
-- Uma chave de API válida da **Anthropic** → [console.anthropic.com](https://console.anthropic.com)
-- **Docker e Docker Compose** *(opcional)*
+- Python 3.11+
+- pip
+- Docker e Docker Compose (opcional)
 
----
+### Sem Docker
 
-### Instalação sem Docker
-
-**1. Clone o repositório**
 ```bash
 git clone https://github.com/jmello04/readme-generator.git
 cd readme-generator
-```
-
-**2. Crie e ative o ambiente virtual**
-```bash
 python -m venv .venv
-
-# Linux / macOS
 source .venv/bin/activate
-
-# Windows (PowerShell)
-.venv\Scripts\Activate.ps1
-```
-
-**3. Instale as dependências**
-```bash
 pip install -r requirements.txt
+cp .env.example .env
+python main.py
 ```
 
-**4. Configure as variáveis de ambiente**
+Acesse: **http://localhost:8000** | Swagger: **http://localhost:8000/docs**
+
+### Com Docker
+
+```bash
+cp .env.example .env
+docker-compose up --build
+```
+
+---
+
+## API Reference
+
+### POST /generate
+
+Retorna o README completo em uma unica resposta JSON.
+
+Campos do payload:
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|---|---|---|---|
+| project_name | string | Sim | Nome do projeto (1-100 chars) |
+| description | string | Sim | Descricao (10-1000 chars) |
+| stack | string | Sim | Tecnologias separadas por virgula |
+| project_type | enum | Sim | api, cli, scraper ou library |
+| has_docker | boolean | Nao | Padrao: false |
+| has_tests | boolean | Nao | Padrao: false |
+| has_cicd | boolean | Nao | Padrao: false |
+| author | string | Nao | Nome do autor |
+| contact | string | Nao | E-mail ou link de contato |
+
+### POST /generate/stream
+
+Versao SSE. Os chunks chegam progressivamente no formato `data: {"content": "..."}`.
+O stream termina com `data: [DONE]`.
+
+### GET /health
+
+Retorna o status atual da aplicacao e versao configurada.
+
+---
+
+## Variaveis de Ambiente
+
 ```bash
 cp .env.example .env
 ```
 
-Edite o `.env` e insira sua chave:
-```env
-ANTHROPIC_API_KEY=sk-ant-...
-MODEL=claude-opus-4-6
-MAX_TOKENS=4096
-```
-
-**5. Inicie o servidor**
-```bash
-python main.py
-# ou
-make dev
-```
-
-Acesse: **http://localhost:8000**
-Swagger UI: **http://localhost:8000/docs**
+| Variavel | Padrao | Descricao |
+|---|---|---|
+| ANTHROPIC_API_KEY | - | Chave de acesso a API de geracao de texto |
+| MODEL | claude-opus-4-6 | Identificador do modelo utilizado |
+| MAX_TOKENS | 4096 | Limite maximo de tokens por geracao |
+| APP_HOST | 0.0.0.0 | Endereco de escuta do servidor |
+| APP_PORT | 8000 | Porta do servidor |
+| DEBUG | false | Modo de depuracao |
 
 ---
 
-### Instalação com Docker
+## Testes
 
-**1. Configure o `.env`** *(mesmo passo acima)*
-
-**2. Suba os containers**
 ```bash
-docker-compose up --build
-# ou
-make docker-up
-```
-
-Acesse: **http://localhost:8000**
-
-**Parar os containers:**
-```bash
-docker-compose down
-# ou
-make docker-down
+make test        # Todos os testes
+make test-cov    # Com relatorio de cobertura
+make lint        # ruff check . --fix
+make format      # ruff format .
 ```
 
 ---
 
-## 📖 API Reference
-
-### `POST /generate`
-Retorna o README completo em JSON.
-
-```bash
-curl -X POST http://localhost:8000/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "project_name": "FastAPI Boilerplate",
-    "description": "Boilerplate production-ready com FastAPI, JWT e PostgreSQL.",
-    "stack": "Python, FastAPI, PostgreSQL, Redis",
-    "project_type": "api",
-    "has_docker": true,
-    "has_tests": true,
-    "has_cicd": false,
-    "author": "João Mello",
-    "contact": "jmello04@github.com"
-  }'
-```
-
-**Resposta (`200 OK`):**
-```json
-{
-  "readme": "# FastAPI Boilerplate\n\n...",
-  "status": "success",
-  "word_count": 842,
-  "char_count": 5231
-}
-```
-
----
-
-### `POST /generate/stream`
-Versão com streaming SSE. Os chunks chegam progressivamente.
-
-```bash
-curl -N -X POST http://localhost:8000/generate/stream \
-  -H "Content-Type: application/json" \
-  -d '{ ... mesmo payload ... }'
-```
-
-**Resposta (SSE):**
-```
-data: {"content": "# FastAPI"}
-data: {"content": " Boilerplate\n\n"}
-data: {"content": "..."}
-data: [DONE]
-```
-
-**Erros no stream:**
-```
-data: {"error": "Chave de API inválida ou não autorizada."}
-```
-
----
-
-### `GET /health`
-Verifica o status da aplicação.
-
-```bash
-curl http://localhost:8000/health
-```
-
-**Resposta:**
-```json
-{
-  "status": "ok",
-  "app": "README Generator",
-  "version": "1.0.0",
-  "model": "claude-opus-4-6"
-}
-```
-
----
-
-### Campos do Payload
-
-| Campo | Tipo | Obrigatório | Descrição |
-|---|---|---|---|
-| `project_name` | `string` | ✅ | Nome do projeto (1-100 chars) |
-| `description` | `string` | ✅ | Descrição (10-1000 chars) |
-| `stack` | `string` | ✅ | Tecnologias separadas por vírgula |
-| `project_type` | `enum` | ✅ | `api` \| `cli` \| `scraper` \| `library` |
-| `has_docker` | `boolean` | ❌ | Padrão: `false` |
-| `has_tests` | `boolean` | ❌ | Padrão: `false` |
-| `has_cicd` | `boolean` | ❌ | Padrão: `false` |
-| `author` | `string` | ❌ | Nome do autor |
-| `contact` | `string` | ❌ | E-mail ou link de contato |
-
----
-
-## 📁 Estrutura de Pastas
+## Estrutura
 
 ```
 readme-generator/
-├── .github/
-│   └── workflows/
-│       └── ci.yml                # Pipeline: lint → testes → build Docker
-├── app/
-│   ├── api/
-│   │   └── routes/
-│   │       ├── generate.py       # POST /generate e /generate/stream
-│   │       └── health.py         # GET /health
-│   ├── core/
-│   │   ├── config.py             # Settings via pydantic-settings
-│   │   └── logging.py            # Logging centralizado
-│   ├── models/
-│   │   └── schemas.py            # ReadmeRequest e ReadmeResponse (Pydantic v2)
-│   ├── services/
-│   │   └── ai_service.py         # Geração sync + streaming async
-│   ├── static/
-│   │   └── index.html            # SPA: Tailwind CSS + marked.js + SSE
-│   └── main.py                   # FastAPI app, middleware, exception handlers
-├── tests/
-│   ├── conftest.py               # Fixtures compartilhadas
-│   ├── test_generate.py          # 9 casos de teste dos endpoints de geração
-│   └── test_health.py            # 3 casos de teste do health check
-├── .env.example                  # Modelo de variáveis de ambiente
-├── .gitignore
-├── CONTRIBUTING.md               # Guia de contribuição
-├── docker-compose.yml
-├── Dockerfile
-├── LICENSE                       # MIT License
-├── main.py                       # Entry point (python main.py)
-├── Makefile                      # Atalhos: make dev, test, lint, docker-up
-├── pyproject.toml                # Metadados, ruff, pytest, coverage
-├── README.md
-└── requirements.txt
++-- .github/workflows/ci.yml
++-- app/
+|   +-- api/routes/
+|   |   +-- generate.py           (POST /generate e /generate/stream)
+|   |   +-- health.py             (GET /health)
+|   +-- core/
+|   |   +-- config.py
+|   |   +-- logging.py
+|   +-- models/schemas.py
+|   +-- services/
+|   |   +-- generation_service.py (geracao sync + streaming async)
+|   +-- static/index.html         (interface web: Tailwind + marked.js + SSE)
+|   +-- main.py
++-- tests/
+|   +-- conftest.py
+|   +-- test_generate.py
+|   +-- test_health.py
++-- .env.example
++-- docker-compose.yml
++-- Dockerfile
++-- LICENSE
++-- main.py
++-- Makefile
++-- pyproject.toml
++-- requirements.txt
 ```
 
 ---
 
-## 🧪 Executando os Testes
+## Licenca
 
-```bash
-# Todos os testes
-make test
-
-# Com relatório de cobertura
-make test-cov
-
-# Teste específico
-pytest tests/test_generate.py -v -k "test_generate_retorna"
-```
-
-**Verificação de estilo:**
-```bash
-make lint    # ruff check . --fix
-make format  # ruff format .
-```
-
----
-
-## 🤝 Como Contribuir
-
-1. **Fork** o repositório no GitHub
-2. **Clone** seu fork: `git clone https://github.com/seu-usuario/readme-generator.git`
-3. **Crie uma branch**: `git checkout -b feature/minha-melhoria`
-4. **Desenvolva** e adicione testes
-5. **Verifique**: `make test && make lint`
-6. **Commit** seguindo [Conventional Commits](https://www.conventionalcommits.org/): `git commit -m "feat: adiciona exportação PDF"`
-7. **Push**: `git push origin feature/minha-melhoria`
-8. **Abra um Pull Request** com descrição detalhada
-
-Leia o [CONTRIBUTING.md](CONTRIBUTING.md) para mais detalhes.
-
----
-
-## 📄 Licença
-
-Distribuído sob a licença **MIT**. Consulte o arquivo [LICENSE](LICENSE) para mais informações.
+Distribuido sob a licenca **MIT**. Consulte o arquivo [LICENSE](LICENSE) para mais informacoes.
 
 ---
 
 <div align="center">
-
-Desenvolvido por **João Mello** · [GitHub @jmello04](https://github.com/jmello04)
-
+Desenvolvido por **Joao Mello** | [GitHub @jmello04](https://github.com/jmello04)
 </div>
